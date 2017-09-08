@@ -8,13 +8,20 @@ module mex_interface
 
 contains
 
-  subroutine mem_alloc()
-    if (.NOT. allocated(x)) then
-      allocate(x(1))
-    endif
+  function mem_alloc()
 
+    integer :: mem_alloc
+
+    if (allocated(x)) then
+      mem_alloc = -1
+      return
+    end if
+
+    allocate(x(1))
     x = 5.0
-  end subroutine mem_alloc
+    mem_alloc = 0
+
+  end function mem_alloc
 
   subroutine mem_check(y)
 
@@ -29,8 +36,18 @@ contains
     y = yy%z
   end subroutine mem_check
 
-  subroutine mem_dealloc()
+  function mem_dealloc()
+
+    integer :: mem_dealloc
+
+    if (.not. allocated(x)) then
+      mem_dealloc = -1
+      return
+    end if
+
     deallocate(x)
-  end subroutine mem_dealloc
+    mem_dealloc = 0
+
+  end function mem_dealloc
 
 end module mex_interface
