@@ -28,10 +28,11 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs)
   ! Arguments for computational routine:
   real*8  x_input, y_output
   character(len=80) marbl_phase
+  character(len=160) message
   integer status
 
   if (nrhs .eq. 0) then
-    call mexPrintf('Need to include phase argument!')
+    call mexPrintf('Need to include phase argument!\n')
     return
   end if
 
@@ -39,14 +40,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs)
   status = mxGetString(prhs(1), marbl_phase, maxbuf)
   select case (trim(marbl_phase))
     case ('init')
-      call mexPrintf('MEX-file note: allocating memory\n')
+      call mexPrintf('MEX-file note: calling init\n')
       ! Call the computational subroutine.
-      if (mem_alloc() .ne. 0) then
-        call mexPrintf('MEX-file note: already allocated!\n')
+      if (init_marbl() .ne. 0) then
+        call mexPrintf('MEX-file note: initialization failed!\n')
       end if
     case ('surface')
-      if (mem_check(y_output) .ne. 0) then
-        call mexPrintf('Mex-file note: memory is not allocated\n')
+      if (compute_marbl_surface_fluxes(y_output) .ne. 0) then
+        call mexPrintf('Mex-file note: error computing surface fluxes\n')
       else
         plhs(1) = mxCreateDoubleMatrix(1,1,0)
         y_ptr = mxGetPr(plhs(1))
@@ -54,8 +55,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs)
         call mxCopyReal8ToPtr(y_output,y_ptr,size)
       end if
     case ('interior')
-      if (mem_check(y_output) .ne. 0) then
-        call mexPrintf('Mex-file note: memory is not allocated\n')
+      if (compute_marbl_interior_tendencies(y_output) .ne. 0) then
+        call mexPrintf('Mex-file note: error computing interior tendencies\n')
       else
         plhs(1) = mxCreateDoubleMatrix(1,1,0)
         y_ptr = mxGetPr(plhs(1))
@@ -64,9 +65,12 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs)
       end if
     case ('shutdown')
       call mexPrintf('MEX-file note: shutting down\n')
-      if (mem_dealloc() .ne. 0) then
-        call mexPrintf('Mex-file note: memory is not allocated\n')
+      if (shutdown_marbl() .ne. 0) then
+        call mexPrintf('Mex-file note: error shutting down MARBL\n')
       end if
+    case DEFAULT
+      write(message, '(3A)') 'Unknown phase: ', trim(marbl_phase), '\n'
+      call mexPrintf(message)
   end select
 
   return

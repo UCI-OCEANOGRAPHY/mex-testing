@@ -1,58 +1,89 @@
 module will_be_marbl
 
   type,public::my_class
-    real*8, allocatable :: data(:)
+    logical, private              :: linit = .false.
+    real*8,  public,  allocatable :: data(:)
   contains
-    procedure, public :: alloc
-    procedure, public :: change_arg
-    procedure, public :: dealloc
-    procedure, public :: is_alloc
+    procedure, public :: initialize
+    procedure, public :: decrement_by_one_half
+    procedure, public :: increment_by_one
+    procedure, public :: shutdown
+    procedure, public :: lis_init
   end type my_class
 
 contains
 
   ! =========================
 
-  function alloc(self)
+  function initialize(self)
 
     class(my_class) :: self
-    integer :: alloc
+    integer :: initialize
 
-    allocate(self%data(1), stat=alloc)
-    if (alloc .eq. 0) self%data = 0
+    allocate(self%data(1), stat=initialize)
+    if (initialize .eq. 0) then
+      self%data = 0
+      self%linit = .true.
+    end if
 
-  end function alloc
+  end function initialize
 
   ! =========================
 
-  subroutine change_arg(self)
+  function decrement_by_one_half(self)
 
     class(my_class),intent(inout) :: self
+    integer :: decrement_by_one_half
 
-    self%data = self%data+1
+    if (self%linit) then
+      self%data = self%data - 0.5
+      decrement_by_one_half = 0
+    else
+      decrement_by_one_half = -1
+    end if
 
-  end subroutine change_arg
-
-  ! =========================
-
-  function dealloc(self)
-
-    class(my_class) :: self
-    integer :: dealloc
-
-    deallocate(self%data, stat=dealloc)
-
-  end function dealloc
+  end function decrement_by_one_half
 
   ! =========================
 
-  function is_alloc(self)
+  function increment_by_one(self)
+
+    class(my_class),intent(inout) :: self
+    integer :: increment_by_one
+
+    if (self%linit) then
+      self%data = self%data+1.
+      increment_by_one = 0
+    else
+      increment_by_one = -1
+    end if
+
+  end function increment_by_one
+
+  ! =========================
+
+  function shutdown(self)
 
     class(my_class) :: self
-    logical :: is_alloc
+    integer :: shutdown
 
-    is_alloc = allocated(self%data)
+    shutdown = 0
+    if (allocated(self%data)) deallocate(self%data, stat=shutdown)
+    self%linit = .false.
 
-  end function is_alloc
+  end function shutdown
+
+  ! =========================
+
+  function lis_init(self)
+
+    class(my_class) :: self
+    logical         :: lis_init
+
+    lis_init = self%linit
+
+  end function lis_init
+
+  ! =========================
 
 end module will_be_marbl
