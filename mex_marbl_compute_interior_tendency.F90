@@ -2,7 +2,7 @@
 
 subroutine mexFunction(nlhs, plhs, nrhs, prhs)
 
-  use mod_90_03
+  use mex_interface
 
   implicit none
 

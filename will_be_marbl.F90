@@ -1,5 +1,4 @@
-module mod_03
-!$gfortran -fPIC -c mod_03.F90
+module will_be_marbl
 type,public::my_class
 real*8 :: z
 contains 
@@ -10,4 +9,4 @@ subroutine change_arg(y)
 class(my_class),intent(inout) :: y
 y%z = y%z+1
 end subroutine change_arg
-end module mod_03
+end module will_be_marbl

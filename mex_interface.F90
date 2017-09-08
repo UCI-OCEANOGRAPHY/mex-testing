@@ -1,4 +1,4 @@
-module mod_90_03
+module mex_interface
 
   implicit none
   public
@@ -18,7 +18,7 @@ contains
 
   subroutine mem_check(y)
 
-    use mod_03
+    use will_be_marbl
 
     real*8 :: y
     type(my_class) :: yy
@@ -33,4 +33,4 @@ contains
     deallocate(x)
   end subroutine mem_dealloc
 
-end module mod_90_03
+end module mex_interface
