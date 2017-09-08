@@ -1,10 +1,11 @@
 all: mex
 .PHONY: mex
 mex:
-	gfortran -fPIC -c will_be_marbl.F90
-	mex mex_interface.F90
-	mex mex_marbl_driver.F90 mex_interface.F90 *.o
+	cd marbl_lib ; $(MAKE) ; cd ..
+	mex -Imarbl_lib mex_interface.F90
+	mex -Imarbl_lib mex_marbl_driver.F90 mex_interface.F90 marbl_lib/*.o
 
 .PHONY: clean
 clean:
-	rm -f *.mod *.o *.mexa64
+	rm -f *.mod *.mexa64
+	cd marbl_lib ; $(MAKE) clean ; cd ..
