@@ -12,41 +12,54 @@ contains
 
   ! =========================
 
-  function mem_alloc()
+  function init_marbl()
 
-    integer :: mem_alloc
+    integer :: init_marbl
 
-    mem_alloc = marbl_instance%alloc()
+    if (marbl_instance%lis_init()) then
+      init_marbl = marbl_instance%shutdown()
+    else
+      init_marbl = 0
+    end if
+    if (init_marbl .eq. 0) init_marbl = marbl_instance%initialize()
 
-  end function mem_alloc
+  end function init_marbl
 
   ! =========================
 
-  function mem_check(out_val)
+  function compute_marbl_surface_fluxes(out_val)
 
     real*8, intent(out) :: out_val
-    integer             :: mem_check
+    integer :: compute_marbl_surface_fluxes
 
-    if (.not. marbl_instance%is_alloc()) then
-      mem_check = -1
-      return
-    end if
+    compute_marbl_surface_fluxes = marbl_instance%decrement_by_one_half()
+    if (compute_marbl_surface_fluxes .eq. 0) &
+      out_val = marbl_instance%data(1)
 
-    mem_check = 0
-    call marbl_instance%change_arg()
-    out_val = marbl_instance%data(1)
-
-  end function mem_check
+  end function compute_marbl_surface_fluxes
 
   ! =========================
 
-  function mem_dealloc()
+  function compute_marbl_interior_tendencies(out_val)
 
-    integer :: mem_dealloc
+    real*8, intent(out) :: out_val
+    integer :: compute_marbl_interior_tendencies
 
-    mem_dealloc = marbl_instance%dealloc()
+    compute_marbl_interior_tendencies = marbl_instance%increment_by_one()
+    if (compute_marbl_interior_tendencies .eq. 0) &
+      out_val = marbl_instance%data(1)
 
-  end function mem_dealloc
+  end function compute_marbl_interior_tendencies
+
+  ! =========================
+
+  function shutdown_marbl()
+
+    integer :: shutdown_marbl
+
+    shutdown_marbl = marbl_instance%shutdown()
+
+  end function shutdown_marbl
 
   ! =========================
 
