@@ -18,7 +18,7 @@ contains
     end if
 
     allocate(x(1))
-    x = 5.0
+    x = 0.0
     mem_alloc = 0
 
   end function mem_alloc
@@ -27,13 +27,14 @@ contains
 
     use will_be_marbl
 
-    real*8 :: y
-    type(my_class) :: yy
+    real*8, intent(out) :: y
+    type(my_class)      :: yy
 
     yy%z=x(1)
     call yy%change_arg()
-    call yy%change_arg()
     y = yy%z
+    x(1) = yy%z
+
   end subroutine mem_check
 
   function mem_dealloc()
