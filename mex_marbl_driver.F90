@@ -45,17 +45,23 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs)
         call mexPrintf('MEX-file note: already allocated!\n')
       end if
     case ('surface')
-      call mem_check(y_output)
-      plhs(1) = mxCreateDoubleMatrix(1,1,0)
-      y_ptr = mxGetPr(plhs(1))
-      size = 1
-      call mxCopyReal8ToPtr(y_output,y_ptr,size)
+      if (mem_check(y_output) .ne. 0) then
+        call mexPrintf('Mex-file note: memory is not allocated\n')
+      else
+        plhs(1) = mxCreateDoubleMatrix(1,1,0)
+        y_ptr = mxGetPr(plhs(1))
+        size = 1
+        call mxCopyReal8ToPtr(y_output,y_ptr,size)
+      end if
     case ('interior')
-      call mem_check(y_output)
-      plhs(1) = mxCreateDoubleMatrix(1,1,0)
-      y_ptr = mxGetPr(plhs(1))
-      size = 1
-  call mxCopyReal8ToPtr(y_output,y_ptr,size)
+      if (mem_check(y_output) .ne. 0) then
+        call mexPrintf('Mex-file note: memory is not allocated\n')
+      else
+        plhs(1) = mxCreateDoubleMatrix(1,1,0)
+        y_ptr = mxGetPr(plhs(1))
+        size = 1
+        call mxCopyReal8ToPtr(y_output,y_ptr,size)
+      end if
     case ('shutdown')
       call mexPrintf('MEX-file note: shutting down\n')
       if (mem_dealloc() .ne. 0) then

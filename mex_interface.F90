@@ -1,54 +1,53 @@
 module mex_interface
 
+  use will_be_marbl, only : my_class
+
   implicit none
   public
   save
 
-  real*8, private, allocatable :: x(:)
+  type(my_class), private :: marbl_instance
 
 contains
+
+  ! =========================
 
   function mem_alloc()
 
     integer :: mem_alloc
 
-    if (allocated(x)) then
-      mem_alloc = -1
-      return
-    end if
-
-    allocate(x(1))
-    x = 0.0
-    mem_alloc = 0
+    mem_alloc = marbl_instance%alloc()
 
   end function mem_alloc
 
-  subroutine mem_check(y)
+  ! =========================
 
-    use will_be_marbl
+  function mem_check(out_val)
 
-    real*8, intent(out) :: y
-    type(my_class)      :: yy
+    real*8, intent(out) :: out_val
+    integer             :: mem_check
 
-    yy%z=x(1)
-    call yy%change_arg()
-    y = yy%z
-    x(1) = yy%z
+    if (.not. marbl_instance%is_alloc()) then
+      mem_check = -1
+      return
+    end if
 
-  end subroutine mem_check
+    mem_check = 0
+    call marbl_instance%change_arg()
+    out_val = marbl_instance%data(1)
+
+  end function mem_check
+
+  ! =========================
 
   function mem_dealloc()
 
     integer :: mem_dealloc
 
-    if (.not. allocated(x)) then
-      mem_dealloc = -1
-      return
-    end if
-
-    deallocate(x)
-    mem_dealloc = 0
+    mem_dealloc = marbl_instance%dealloc()
 
   end function mem_dealloc
+
+  ! =========================
 
 end module mex_interface
